@@ -1,3 +1,4 @@
+import behavior.fly.FlyWithSuperWings
 import duck.*
 
 fun drawDuck(duck: Duck) {
@@ -17,6 +18,12 @@ fun playWithDuck(duck: Duck) {
 fun main(args: Array<String>) {
     val mallardDuck = MallardDuck()
     playWithDuck(mallardDuck)
+
+    mallardDuck.fly()
+
+    mallardDuck.setFlyBehavior(FlyWithSuperWings())
+    mallardDuck.fly()
+    mallardDuck.fly()
 
     val redheadDuck = RedheadDuck()
     playWithDuck(redheadDuck)
