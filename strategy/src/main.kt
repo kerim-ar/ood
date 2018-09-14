@@ -1,6 +1,7 @@
 import behavior.fly.FlyWithSuperWings
 import duck.*
 import fp.*
+import kotlin.reflect.jvm.reflect
 
 fun playWithDuck(duck: Duck) {
     duck.display()
@@ -44,12 +45,15 @@ fun main(args: Array<String>) {
 
     ///////////////////////////////////////
 
-    val mallardDuckFP = DuckFP(::flyWithWings, ::quack, ::danceWaltz, { println("I'm mallard duck") })
+    val mallardDuckFP = DuckFP(::makeFlyWithWingsBehavior.call(), ::quack, ::danceWaltz, { println("I'm mallard duck") })
     playWithDuckFP(mallardDuckFP)
-    mallardDuckFP.setFlyBehavior(::flyWithSuperWings)
     mallardDuckFP.fly()
 
-    val redheadDuckFP = DuckFP(::flyWithWings, ::quack, ::danceMinuet, { println("I'm redhead duck") })
+    mallardDuckFP.setFlyBehavior(::makeFlyWithSuperWingsBehavior.call())
+    mallardDuckFP.fly()
+    mallardDuckFP.fly()
+
+    val redheadDuckFP = DuckFP(::makeFlyWithWingsBehavior.call(), ::quack, ::danceMinuet, { println("I'm redhead duck") })
     playWithDuckFP(redheadDuckFP)
 
     val decoyDuckFP = DuckFP({}, {}, {}, { println("I'm decoy duck") })
