@@ -1,6 +1,8 @@
 #include "IObservable.h"
 #include "IObserver.h"
-#include <set>
+#include <vector>
+#include <map>
+#include <algorithm>
 
 // Реализация интерфейса IObservable
 template <class T>
@@ -9,23 +11,38 @@ class CObservable : public IObservable<T>
 public:
 	typedef IObserver<T> ObserverType;
 
-	void RegisterObserver(ObserverType & observer) override
+	void RegisterObserver(ObserverType & observer, unsigned int priority = 0) override
 	{
-		m_observers.insert(&observer);
+		auto it = m_observers.find(priority);
+		if (it == m_observers.end())
+		{
+			m_observers.insert(std::pair<unsigned, std::vector<ObserverType *>>(priority, { &observer }));
+		}
+		else
+		{
+			m_observers.at(priority).push_back(&observer);
+		}
 	}
 
 	void NotifyObservers() override
 	{
 		T data = GetChangedData();
-		for (auto & observer : m_observers)
+		for (auto it = m_observers.begin(); it != m_observers.end(); ++it)
 		{
-			observer->Update(data);
+			for (auto & observer : it->second)
+			{
+				observer->Update(data);
+			}
 		}
 	}
 
 	void RemoveObserver(ObserverType & observer) override
 	{
-		m_observers.erase(&observer);
+		for (auto it = m_observers.begin(); it != m_observers.end(); ++it)
+		{
+			auto & observers = it->second;
+			observers.erase(std::remove(observers.begin(), observers.end(), &observer), observers.end());
+		}
 	}
 
 protected:
@@ -34,5 +51,5 @@ protected:
 	virtual T GetChangedData()const = 0;
 
 private:
-	std::set<ObserverType *> m_observers;
+	std::map<unsigned, std::vector<ObserverType *>, std::greater<unsigned>> m_observers;
 };
